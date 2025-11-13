@@ -1,0 +1,18 @@
+# Executável
+antiaerea
+
+# Arquivos objeto
+*.o
+*.out
+
+# macOS
+.DS_Store
+
+# Editor temporários
+*.swp
+*.swo
+*~
+
+# Diretórios de build
+build/
+bin/
