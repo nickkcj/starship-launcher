@@ -1,36 +1,58 @@
-// PESSOA 1 - Implementação da bateria
+// Nick J - Implementação da bateria
 
 #include "bateria.h"
 #include <cstdlib>
 
 Bateria* criarBateria(int x, int y) {
-    // TODO: Alocar memória para bateria e inicializar campos
-    // Exemplo:
-    // Bateria* bat = new Bateria;
-    // bat->x = x;
-    // bat->y = y;
-    // bat->angulo = VERTICAL;
-    // return bat;
+    Bateria* bat = new Bateria();
+    bat->x = x;
+    bat->y = y;
+    bat->angulo = VERTICAL; // Padrão para vertical
 
-    return nullptr; // SUBSTITUIR
+    return bat;
 }
 
 void desenharBateria(SDL_Renderer* renderer, Bateria* bat) {
-    // TODO: Desenhar bateria na tela baseado no ângulo
-    // Dica: usar SDL_RenderDrawLine ou SDL_RenderFillRect
-    // Desenhar de forma diferente para cada ângulo
+    if (!bat) return;
 
-    // Exemplo para vertical:
-    // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Verde
-    // SDL_RenderDrawLine(renderer, bat->x, bat->y, bat->x, bat->y - 30);
-}
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    SDL_Rect base = {bat->x - 20, bat->y - 10, 40, 10};
+    SDL_RenderFillRect(renderer, &base);
+
+    // Canhão (muda com base no angulo)
+    switch(bat->angulo) {
+          case VERTICAL:
+              SDL_RenderDrawLine(renderer,
+  bat->x, bat->y, bat->x, bat->y - 30);
+              break;
+          case DIAGONAL_ESQ:
+              SDL_RenderDrawLine(renderer,
+  bat->x, bat->y, bat->x - 20, bat->y - 20);
+              break;
+          case DIAGONAL_DIR:
+              SDL_RenderDrawLine(renderer,
+  bat->x, bat->y, bat->x + 20, bat->y - 20);
+              break;
+          case HORIZONTAL_ESQ:
+              SDL_RenderDrawLine(renderer,
+  bat->x, bat->y, bat->x - 30, bat->y);
+              break;
+          case HORIZONTAL_DIR:
+              SDL_RenderDrawLine(renderer,
+  bat->x, bat->y, bat->x + 30, bat->y);
+              break;
+      }
+  }
+
 
 void mudarAngulo(Bateria* bat, AnguloDisparo novoAngulo) {
-    // TODO: Atualizar o ângulo da bateria
-    // bat->angulo = novoAngulo;
+    if (bat) {
+        bat->angulo = novoAngulo;
+    }
 }
 
 void destruirBateria(Bateria* bat) {
-    // TODO: Liberar memória
-    // delete bat;
+    if (bat) {
+        delete bat;
+    }
 }
