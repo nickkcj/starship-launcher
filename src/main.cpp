@@ -1,9 +1,12 @@
 // Nick J - Loop principal do jogo (evoluindo aos poucos)
-// Versão atual: Etapa 2 - Controlar ângulo com teclado
+// Versão atual: Etapa 5 - Disparar foguetes
 
 #include <SDL.h>
 #include <iostream>
 #include "entities/bateria.h"
+#include "entities/foguete.h"
+#include "core/game.h"
+#include "core/renderer.h"
 
 const int LARGURA = 800;
 const int ALTURA = 600;
@@ -16,6 +19,7 @@ int main() {
     std::cout << "  → (RIGHT) - Diagonal Direita\n";
     std::cout << "  Q         - Horizontal Esquerda\n";
     std::cout << "  E         - Horizontal Direita\n";
+    std::cout << "  ESPAÇO    - DISPARAR!\n";
     std::cout << "  ESC       - Sair\n\n";
 
     // 1. INICIALIZAR SDL
@@ -56,10 +60,15 @@ int main() {
 
     std::cout << "Janela criada com sucesso!\n";
 
-    // 4. CRIAR BATERIA
-    Bateria* bateria = criarBateria(LARGURA/2, ALTURA - 80);
+    // 4. INICIALIZAR ESTADO DO JOGO
+    EstadoJogo estado;
+    inicializarJogo(&estado, 0);  // 0 = dificuldade média por enquanto
 
-    // 5. LOOP PRINCIPAL
+    // 5. CRIAR BATERIA
+    Bateria* bateria = criarBateria(LARGURA/2, ALTURA - 80);
+    estado.bateria = bateria;  // Associar bateria ao estado
+
+    // 6. LOOP PRINCIPAL
     bool jogoAtivo = true;
     SDL_Event evento;
 
@@ -96,6 +105,56 @@ int main() {
                         mudarAngulo(bateria, HORIZONTAL_DIR);
                         std::cout << "Ângulo: HORIZONTAL DIREITA\n";
                         break;
+
+                    // Disparar foguete
+                    case SDLK_SPACE: {
+                        pthread_mutex_lock(&estado.mutexLancadores);
+
+                        // Procurar lançador carregado
+                        int lancadorUsado = -1;
+                        for(int i = 0; i < estado.numLancadores; i++) {
+                            if(estado.lancadores[i] == 1) {
+                                lancadorUsado = i;
+                                break;
+                            }
+                        }
+
+                        if(lancadorUsado == -1) {
+                            std::cout << "VAZIO! Sem foguetes disponíveis\n";
+                        } else {
+                            // Criar foguete na posição da bateria
+                            Foguete* fog = criarFoguete(bateria->x, bateria->y, bateria->angulo);
+
+                            // Adicionar na lista (mutex!)
+                            pthread_mutex_lock(&estado.mutexGeral);
+                            estado.foguetes.push_back(fog);
+                            pthread_mutex_unlock(&estado.mutexGeral);
+
+                            // Criar estrutura de dados para thread
+                            struct DadosFoguete {
+                                Foguete* foguete;
+                                EstadoJogo* estado;
+                            };
+                            DadosFoguete* dados = new DadosFoguete;
+                            dados->foguete = fog;
+                            dados->estado = &estado;
+
+                            // Criar thread do foguete
+                            pthread_create(&fog->thread, nullptr, threadFoguete, dados);
+                            pthread_detach(fog->thread);  // Detach para não precisar fazer join
+
+                            // Descarregar lançador
+                            estado.lancadores[lancadorUsado] = 0;
+
+                            // Sinalizar carregador (quando Nick C implementar)
+                            pthread_cond_signal(&estado.condCarregador);
+
+                            std::cout << "DISPAROU do lançador " << lancadorUsado << "!\n";
+                        }
+
+                        pthread_mutex_unlock(&estado.mutexLancadores);
+                        break;
+                    }
                 }
             }
         }
@@ -113,6 +172,16 @@ int main() {
         // Desenhar bateria
         desenharBateria(renderer, bateria);
 
+        // Desenhar foguetes
+        pthread_mutex_lock(&estado.mutexGeral);
+        for(auto fog : estado.foguetes) {
+            desenharFoguete(renderer, fog);
+        }
+        pthread_mutex_unlock(&estado.mutexGeral);
+
+        // Desenhar HUD (lançadores)
+        desenharHUD(renderer, &estado);
+
         // Apresentar na tela
         SDL_RenderPresent(renderer);
 
@@ -120,9 +189,10 @@ int main() {
         SDL_Delay(16);
     }
 
-    // 6. LIMPAR E ENCERRAR
+    // 7. LIMPAR E ENCERRAR
     std::cout << "Encerrando...\n";
 
+    finalizarJogo(&estado);
     destruirBateria(bateria);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(janela);

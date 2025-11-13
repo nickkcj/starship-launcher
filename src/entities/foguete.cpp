@@ -4,44 +4,79 @@
 #include "../core/game.h"
 #include <unistd.h>
 
-Foguete* criarFoguete(int x, int y, AnguloDisparo angulo) {
-    // TODO: Criar foguete
-    // - Alocar memória
-    // - Inicializar posição, ângulo, velocidade
-    // - Marcar como ativo
-    // - NÃO criar thread aqui (main.cpp faz isso)
+// Estrutura para passar dados para thread do foguete
+struct DadosFoguete {
+    Foguete* foguete;
+    EstadoJogo* estado;
+};
 
-    return nullptr; // SUBSTITUIR
+Foguete* criarFoguete(int x, int y, AnguloDisparo angulo) {
+    Foguete* fog = new Foguete;
+    fog->x = x;
+    fog->y = y;
+    fog->angulo = angulo;
+    fog->velocidade = 8;  // Pixels por frame
+    fog->ativo = true;
+
+    return fog;
 }
 
 void desenharFoguete(SDL_Renderer* renderer, Foguete* fog) {
-    // TODO: Desenhar foguete como um pequeno retângulo ou círculo
-    // Exemplo:
-    // SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); // Amarelo
-    // SDL_Rect rect = {fog->x - 2, fog->y - 2, 4, 4};
-    // SDL_RenderFillRect(renderer, &rect);
+    if (!fog || !fog->ativo) return;
+
+    // Desenhar foguete como pequeno retângulo amarelo
+    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+    SDL_Rect rect = {fog->x - 3, fog->y - 3, 6, 6};
+    SDL_RenderFillRect(renderer, &rect);
+
+    // Borda vermelha para destaque
+    SDL_SetRenderDrawColor(renderer, 255, 100, 0, 255);
+    SDL_RenderDrawRect(renderer, &rect);
 }
 
 void* threadFoguete(void* arg) {
-    // TODO: Thread que move o foguete continuamente
-    // 1. Receber ponteiro para EstadoJogo
-    // 2. Loop enquanto foguete ativo:
-    //    - Atualizar posição baseado no ângulo
-    //    - Verificar se saiu da tela (marcar inativo)
-    //    - Dormir um pouco (usleep)
-    // 3. Retornar
+    DadosFoguete* dados = (DadosFoguete*)arg;
+    Foguete* fog = dados->foguete;
+    EstadoJogo* estado = dados->estado;
 
-    // Dica: movimento baseado no ângulo:
-    // VERTICAL: y diminui
-    // DIAGONAL_ESQ: y diminui, x diminui
-    // DIAGONAL_DIR: y diminui, x aumenta
-    // HORIZONTAL_ESQ: x diminui
-    // HORIZONTAL_DIR: x aumenta
+    while (fog->ativo && estado->jogoAtivo) {
+        // Atualizar posição baseado no ângulo
+        switch(fog->angulo) {
+            case VERTICAL:
+                fog->y -= fog->velocidade;  // Sobe
+                break;
+            case DIAGONAL_ESQ:
+                fog->y -= fog->velocidade * 0.7;  // Sobe e vai pra esquerda
+                fog->x -= fog->velocidade * 0.7;
+                break;
+            case DIAGONAL_DIR:
+                fog->y -= fog->velocidade * 0.7;  // Sobe e vai pra direita
+                fog->x += fog->velocidade * 0.7;
+                break;
+            case HORIZONTAL_ESQ:
+                fog->x -= fog->velocidade;  // Vai pra esquerda
+                break;
+            case HORIZONTAL_DIR:
+                fog->x += fog->velocidade;  // Vai pra direita
+                break;
+        }
 
+        // Verificar se saiu da tela
+        if (fog->y < -10 || fog->y > ALTURA_TELA + 10 ||
+            fog->x < -10 || fog->x > LARGURA_TELA + 10) {
+            fog->ativo = false;
+        }
+
+        // ~60 FPS
+        usleep(16667);  // ~16ms
+    }
+
+    delete dados;  // Liberar dados passados para thread
     return nullptr;
 }
 
 void destruirFoguete(Foguete* fog) {
-    // TODO: Liberar memória
-    // delete fog;
+    if (fog) {
+        delete fog;
+    }
 }
