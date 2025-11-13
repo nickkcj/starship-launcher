@@ -10,7 +10,7 @@ CXXFLAGS = -std=c++11 -Wall -pthread
 SDL_FLAGS = $(shell sdl2-config --cflags --libs)
 
 # Arquivos
-SRC_ETAPA1 = src/main.cpp src/entities/bateria.cpp src/entities/foguete.cpp src/core/game.cpp src/core/renderer.cpp
+SRC_ETAPA1 = src/main.cpp src/entities/bateria.cpp src/entities/foguete.cpp src/core/game.cpp src/core/renderer.cpp src/systems/colisao.cpp
 SRC_FULL = src/core/game.cpp src/core/renderer.cpp \
            src/entities/bateria.cpp src/entities/nave.cpp src/entities/foguete.cpp \
            src/systems/colisao.cpp src/systems/carregador.cpp src/systems/dificuldade.cpp \
@@ -18,12 +18,12 @@ SRC_FULL = src/core/game.cpp src/core/renderer.cpp \
 
 TARGET = antiaerea
 
-# Regra padrão: compila versão atual (Etapa 5: Disparar foguetes)
+# Regra padrão: compila versão atual (Etapa 7: Detecção de colisão)
 all: $(TARGET)
 
 # Compilar versão atual
 $(TARGET): $(SRC_ETAPA1)
-	@echo "Compilando Etapa 5 (Disparar foguetes com threads)..."
+	@echo "Compilando Etapa 7 (Detecção de colisão)..."
 	$(CXX) $(CXXFLAGS) $(SRC_ETAPA1) -o $(TARGET) $(SDL_FLAGS)
 	@echo "✓ Compilado! Execute com: ./$(TARGET)"
 

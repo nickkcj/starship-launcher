@@ -1,5 +1,5 @@
 // Nick J - Loop principal do jogo (evoluindo aos poucos)
-// Versão atual: Etapa 5 - Disparar foguetes
+// Versão atual: Etapa 7 - Detecção de colisão
 
 #include <SDL.h>
 #include <iostream>
@@ -7,6 +7,7 @@
 #include "entities/foguete.h"
 #include "core/game.h"
 #include "core/renderer.h"
+#include "systems/colisao.h"
 
 const int LARGURA = 800;
 const int ALTURA = 600;
@@ -185,7 +186,10 @@ int main() {
         // Apresentar na tela
         SDL_RenderPresent(renderer);
 
-        // C. Controlar FPS (~60 FPS)
+        // C. Verificar colisões
+        verificarTodasColisoes(&estado);
+
+        // D. Controlar FPS (~60 FPS)
         SDL_Delay(16);
     }
 
