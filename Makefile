@@ -10,7 +10,7 @@ CXXFLAGS = -std=c++11 -Wall -pthread
 SDL_FLAGS = $(shell sdl2-config --cflags --libs)
 
 # Arquivos
-SRC_HELLO = src/main.cpp
+SRC_ETAPA1 = src/main.cpp src/entities/bateria.cpp
 SRC_FULL = src/core/game.cpp src/core/renderer.cpp \
            src/entities/bateria.cpp src/entities/nave.cpp src/entities/foguete.cpp \
            src/systems/colisao.cpp src/systems/carregador.cpp src/systems/dificuldade.cpp \
@@ -18,13 +18,13 @@ SRC_FULL = src/core/game.cpp src/core/renderer.cpp \
 
 TARGET = antiaerea
 
-# Regra padrão: compila hello world simples (para testar SDL2)
+# Regra padrão: compila versão atual (Etapa 1: Bateria)
 all: $(TARGET)
 
-# Compilar hello world (atual)
-$(TARGET): $(SRC_HELLO)
-	@echo "Compilando hello world..."
-	$(CXX) $(CXXFLAGS) $(SRC_HELLO) -o $(TARGET) $(SDL_FLAGS)
+# Compilar versão atual
+$(TARGET): $(SRC_ETAPA1)
+	@echo "Compilando Etapa 1 (Bateria)..."
+	$(CXX) $(CXXFLAGS) $(SRC_ETAPA1) -o $(TARGET) $(SDL_FLAGS)
 	@echo "✓ Compilado! Execute com: ./$(TARGET)"
 
 # Compilar jogo completo (quando implementado)

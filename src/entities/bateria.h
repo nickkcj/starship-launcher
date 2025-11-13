@@ -8,7 +8,7 @@
 // Ângulos possíveis da bateria
 enum AnguloDisparo {
     VERTICAL = 0,      // 90° |
-    DIAGONAL_ESQ = 1,  // 45° \
+    DIAGONAL_ESQ = 1,  // 45° 
     DIAGONAL_DIR = 2,  // 45° /
     HORIZONTAL_ESQ = 3,// 180° __
     HORIZONTAL_DIR = 4 // 180° __
