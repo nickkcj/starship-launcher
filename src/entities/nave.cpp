@@ -1,4 +1,4 @@
-// PESSOA 2 - Implementação das naves
+// Nick D - Implementação das naves
 
 #include "nave.h"
 #include "../core/game.h"

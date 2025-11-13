@@ -1,4 +1,4 @@
-// PESSOA 1 - Foguetes
+// Nick J - Foguetes
 
 #ifndef FOGUETE_H
 #define FOGUETE_H

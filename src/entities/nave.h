@@ -1,4 +1,4 @@
-// PESSOA 2 - Naves alienígenas
+// Nick D - Naves alienígenas
 
 #ifndef NAVE_H
 #define NAVE_H

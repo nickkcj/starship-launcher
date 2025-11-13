@@ -1,4 +1,4 @@
-// PESSOA 1 - Estado global do jogo e sincronização
+// Nick J - Estado global do jogo e sincronização
 // Define as estruturas principais e variáveis compartilhadas entre threads
 
 #ifndef GAME_H

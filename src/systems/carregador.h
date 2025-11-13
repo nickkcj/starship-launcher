@@ -1,4 +1,4 @@
-// PESSOA 3 - Thread carregador de foguetes
+// Nick C - Thread carregador de foguetes
 
 #ifndef CARREGADOR_H
 #define CARREGADOR_H

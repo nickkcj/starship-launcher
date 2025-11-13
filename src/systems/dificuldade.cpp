@@ -1,4 +1,4 @@
-// PESSOA 3 - Implementação de dificuldade
+// Nick C - Implementação de dificuldade
 
 #include "dificuldade.h"
 #include "../core/game.h"

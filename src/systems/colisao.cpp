@@ -1,4 +1,4 @@
-// PESSOA 1 - Implementação de colisão
+// Nick J - Implementação de colisão
 
 #include "colisao.h"
 #include "../core/game.h"

@@ -1,4 +1,4 @@
-// PESSOA 1 - Implementação dos foguetes
+// Nick J - Implementação dos foguetes
 
 #include "foguete.h"
 #include "../core/game.h"

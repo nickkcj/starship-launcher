@@ -1,4 +1,4 @@
-// PESSOA 3 - Implementação do carregador
+// Nick C - Implementação do carregador
 
 #include "carregador.h"
 #include "../core/game.h"

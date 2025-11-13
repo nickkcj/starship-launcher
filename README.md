@@ -35,19 +35,19 @@ brew install sdl2
 ```
 .
 ├── src/
-│   ├── main.cpp              # [P1] Hello World SDL2
-│   ├── main_completo.cpp     # [P1] Loop principal (versão final)
+│   ├── main.cpp              # [Nick J] Hello World SDL2
+│   ├── main_completo.cpp     # [Nick J] Loop principal (versão final)
 │   ├── core/                 # Núcleo do jogo
-│   │   ├── game.h/cpp        # [P1] Estado global, sincronização
-│   │   └── renderer.h/cpp    # [P1] Sistema de renderização
+│   │   ├── game.h/cpp        # [Nick J] Estado global, sincronização
+│   │   └── renderer.h/cpp    # [Nick J] Sistema de renderização
 │   ├── entities/             # Entidades do jogo
-│   │   ├── bateria.h/cpp     # [P1] Bateria antiaérea
-│   │   ├── nave.h/cpp        # [P2] Naves e spawn
-│   │   └── foguete.h/cpp     # [P1] Foguetes e threads
+│   │   ├── bateria.h/cpp     # [Nick J] Bateria antiaérea
+│   │   ├── nave.h/cpp        # [Nick D] Naves e spawn
+│   │   └── foguete.h/cpp     # [Nick J] Foguetes e threads
 │   └── systems/              # Sistemas e lógica
-│       ├── colisao.h/cpp     # [P1] Detecção de colisão
-│       ├── carregador.h/cpp  # [P3] Thread carregador
-│       └── dificuldade.h/cpp # [P3] Níveis e condições fim
+│       ├── colisao.h/cpp     # [Nick J] Detecção de colisão
+│       ├── carregador.h/cpp  # [Nick C] Thread carregador
+│       └── dificuldade.h/cpp # [Nick C] Níveis e condições fim
 ├── docs/
 │   ├── 01-cpp-basico.md      # Tutorial C++ para Python/Java devs
 │   └── 02-pthreads.md        # Tutorial pthreads completo
@@ -67,9 +67,9 @@ brew install sdl2
 
 ## Divisão de Trabalho
 
-- **Pessoa 1 (50%)**: Core do jogo, integração, threads principais
-- **Pessoa 2 (25%)**: Naves + relatório
-- **Pessoa 3 (25%)**: Carregador, dificuldade + relatório
+- **Nick J (50%)**: Core do jogo, integração, threads principais
+- **Nick D (25%)**: Naves + relatório
+- **Nick C (25%)**: Carregador, dificuldade + relatório
 
 Ver `DIVISAO_TRABALHO.md` para detalhes.
 

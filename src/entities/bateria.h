@@ -1,4 +1,4 @@
-// PESSOA 1 - Bateria antiaérea
+// Nick J - Bateria antiaérea
 
 #ifndef BATERIA_H
 #define BATERIA_H

@@ -1,4 +1,4 @@
-// PESSOA 1 - Sistema de renderização (desenhar na tela)
+// Nick J - Sistema de renderização (desenhar na tela)
 
 #ifndef RENDERER_H
 #define RENDERER_H

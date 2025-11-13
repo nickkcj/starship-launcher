@@ -1,4 +1,4 @@
-// PESSOA 3 - Sistema de níveis de dificuldade
+// Nick C - Sistema de níveis de dificuldade
 
 #ifndef DIFICULDADE_H
 #define DIFICULDADE_H

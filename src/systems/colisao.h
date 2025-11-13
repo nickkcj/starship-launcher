@@ -1,4 +1,4 @@
-// PESSOA 1 - Detecção de colisão
+// Nick J - Detecção de colisão
 
 #ifndef COLISAO_H
 #define COLISAO_H

@@ -1,4 +1,4 @@
-// PESSOA 1 - Implementação do estado do jogo
+// Nick J - Implementação do estado do jogo
 
 #include "game.h"
 #include "../entities/bateria.h"

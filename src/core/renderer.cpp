@@ -1,4 +1,4 @@
-// PESSOA 1 - Implementação do renderizador
+// Nick J - Implementação do renderizador
 
 #include "renderer.h"
 #include "../entities/bateria.h"
