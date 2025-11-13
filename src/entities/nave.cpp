@@ -4,23 +4,51 @@
 #include "../core/game.h"
 #include <cstdlib>
 #include <unistd.h>
+#include <iostream>
+
+SDL_Texture* carregarTexturaNave(SDL_Renderer* renderer, const char* caminhoImagem) {
+    // Carregar imagem PNG usando SDL_image
+    SDL_Surface* surface = IMG_Load(caminhoImagem);
+    if (!surface) {
+        std::cout << "Erro ao carregar PNG: " << IMG_GetError() << "\n";
+        return nullptr;
+    }
+
+    // Converter para textura
+    SDL_Texture* textura = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+
+    if (!textura) {
+        std::cout << "Erro ao criar textura: " << SDL_GetError() << "\n";
+    }
+
+    return textura;
+}
 
 Nave* criarNave(int x, int velocidade) {
-    // TODO: Criar nave
+    // TODO (Nick D): Criar nave
     // - Alocar memória
     // - Inicializar x, y=0, velocidade
     // - Marcar como ativa
+    // - nave->textura = nullptr (será carregada no main.cpp)
     // - NÃO criar thread aqui (threadSpawnNaves faz isso)
 
     return nullptr; // SUBSTITUIR
 }
 
 void desenharNave(SDL_Renderer* renderer, Nave* nave) {
-    // TODO: Desenhar nave como retângulo ou triângulo
-    // Exemplo:
-    // SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Vermelho
-    // SDL_Rect rect = {nave->x - 10, nave->y - 5, 20, 10};
-    // SDL_RenderFillRect(renderer, &rect);
+    if (!nave || !nave->ativa) return;
+
+    // Se tem textura PNG, desenhar ela
+    if (nave->textura) {
+        SDL_Rect destino = {nave->x - 20, nave->y - 20, 40, 40};
+        SDL_RenderCopy(renderer, nave->textura, nullptr, &destino);
+    } else {
+        // Fallback: retângulo vermelho se não tiver PNG
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_Rect rect = {nave->x - 15, nave->y - 10, 30, 20};
+        SDL_RenderFillRect(renderer, &rect);
+    }
 }
 
 void* threadNave(void* arg) {
