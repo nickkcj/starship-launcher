@@ -4,29 +4,32 @@
 #include "../entities/bateria.h"
 #include "../entities/nave.h"
 #include "../entities/foguete.h"
+#include "../systems/dificuldade.h"
 #include <cstdlib>
 
 void inicializarJogo(EstadoJogo* estado, int dificuldade) {
+    // Obter parâmetros baseado na dificuldade
+    ParametrosDificuldade params = obterParametros((Dificuldade)dificuldade);
+
     // Inicializar bateria (NULL por enquanto, criamos no main)
     estado->bateria = nullptr;
 
-    // Configurar lançadores (por enquanto 3 fixo, depois ajustamos por dificuldade)
-    estado->numLancadores = 3;
+    // Configurar lançadores baseado na dificuldade
+    estado->numLancadores = params.numLancadores;
     for(int i = 0; i < 5; i++) {
         estado->lancadores[i] = 0;  // Todos vazios no início
     }
-    // Para testar, começar com 1 lançador carregado
-    estado->lancadores[0] = 1;
+    estado->lancadores[0] = 1;  // Começar com 1 carregado
 
     // Resetar contadores
     estado->navesAbatidas = 0;
     estado->navesEscaparam = 0;
-    estado->totalNaves = 10;  // Por enquanto fixo
+    estado->totalNaves = params.totalNaves;
 
     // Estado do jogo
     estado->jogoAtivo = true;
     estado->vitoria = false;
-    estado->tempoRecarga = 2;  // 2 segundos (ajustar quando implementar dificuldade)
+    estado->tempoRecarga = params.tempoRecarga;
 
     // Inicializar mutexes e condition variables
     pthread_mutex_init(&estado->mutexGeral, nullptr);
