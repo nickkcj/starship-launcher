@@ -5,6 +5,7 @@
 #include <iostream>
 #include "entities/bateria.h"
 #include "entities/foguete.h"
+#include "entities/nave.h"
 #include "core/game.h"
 #include "core/renderer.h"
 #include "systems/colisao.h"
@@ -65,6 +66,13 @@ int main() {
     // 4. INICIALIZAR ESTADO DO JOGO
     EstadoJogo estado;
     inicializarJogo(&estado, 0);  // 0 = dificuldade média por enquanto
+    estado.renderer = renderer;  // Passar renderer para o estado
+
+    // 4.1 CARREGAR TEXTURA DA NAVE
+    estado.texturaNave = carregarTexturaNave(renderer, "assets/ship.png");
+    if (!estado.texturaNave) {
+        std::cout << "Aviso: Textura da nave não carregada, usando retângulo vermelho\n";
+    }
 
     // 5. CRIAR BATERIA
     Bateria* bateria = criarBateria(LARGURA/2, ALTURA - 80);
@@ -73,6 +81,10 @@ int main() {
     // 5.1 CRIAR THREAD DO CARREGADOR
     pthread_t threadCarreg;
     pthread_create(&threadCarreg, nullptr, threadCarregador, &estado);
+
+    // 5.2 CRIAR THREAD DE SPAWN DE NAVES
+    pthread_t threadSpawn;
+    pthread_create(&threadSpawn, nullptr, threadSpawnNaves, &estado);
 
     // 6. LOOP PRINCIPAL
     bool jogoAtivo = true;
@@ -178,6 +190,13 @@ int main() {
         // Desenhar bateria
         desenharBateria(renderer, bateria);
 
+        // Desenhar naves
+        pthread_mutex_lock(&estado.mutexGeral);
+        for(auto nave : estado.naves) {
+            desenharNave(renderer, nave);
+        }
+        pthread_mutex_unlock(&estado.mutexGeral);
+
         // Desenhar foguetes
         pthread_mutex_lock(&estado.mutexGeral);
         for(auto fog : estado.foguetes) {
@@ -201,10 +220,17 @@ int main() {
     // 7. LIMPAR E ENCERRAR
     std::cout << "Encerrando...\n";
 
-    // Encerrar thread do carregador
+    // Encerrar threads
     estado.jogoAtivo = false;
-    pthread_cond_signal(&estado.condCarregador);  // Acordar para sair do loop
+    pthread_cond_signal(&estado.condCarregador);  // Acordar carregador para sair do loop
     pthread_join(threadCarreg, nullptr);
+    pthread_join(threadSpawn, nullptr);
+
+    // Mostrar estatísticas finais
+    std::cout << "\n=== ESTATÍSTICAS ===\n";
+    std::cout << "Naves abatidas: " << estado.navesAbatidas << "\n";
+    std::cout << "Naves escaparam: " << estado.navesEscaparam << "\n";
+    std::cout << "Total de naves: " << estado.totalNaves << "\n";
 
     finalizarJogo(&estado);
     destruirBateria(bateria);

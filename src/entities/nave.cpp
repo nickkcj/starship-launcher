@@ -3,6 +3,7 @@
 #include "nave.h"
 #include "../core/game.h"
 #include <cstdlib>
+#include <ctime>
 #include <unistd.h>
 #include <iostream>
 
@@ -26,23 +27,28 @@ SDL_Texture* carregarTexturaNave(SDL_Renderer* renderer, const char* caminhoImag
 }
 
 Nave* criarNave(int x, int velocidade) {
-    // TODO (Nick D): Criar nave
-    // - Alocar memória
-    // - Inicializar x, y=0, velocidade
-    // - Marcar como ativa
-    // - nave->textura = nullptr (será carregada no main.cpp)
-    // - NÃO criar thread aqui (threadSpawnNaves faz isso)
-
-    return nullptr; // SUBSTITUIR
+    // Alocar memória para a nave
+    Nave* nave = new Nave;
+    
+    // Inicializar posição e propriedades
+    nave->x = x;
+    nave->y = 0;  // Começa no topo da tela
+    nave->velocidade = velocidade;
+    nave->ativa = true;
+    nave->textura = nullptr;  // Será carregada no main.cpp se necessário
+    
+    return nave;
 }
 
 void desenharNave(SDL_Renderer* renderer, Nave* nave) {
     if (!nave || !nave->ativa) return;
 
-    // Se tem textura PNG, desenhar ela
+    // Se tem textura PNG, desenhar ela rotacionada 180° (caindo de cabeça para baixo)
     if (nave->textura) {
         SDL_Rect destino = {nave->x - 20, nave->y - 20, 40, 40};
-        SDL_RenderCopy(renderer, nave->textura, nullptr, &destino);
+        SDL_RenderCopyEx(renderer, nave->textura, nullptr, &destino, 
+                         180.0,  // Rotação de 180 graus
+                         nullptr, SDL_FLIP_NONE);
     } else {
         // Fallback: retângulo vermelho se não tiver PNG
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
@@ -52,47 +58,101 @@ void desenharNave(SDL_Renderer* renderer, Nave* nave) {
 }
 
 void* threadNave(void* arg) {
-    // TODO: Thread que move a nave para baixo
-    // 1. Receber ponteiro para estrutura com (EstadoJogo*, Nave*)
-    // 2. Loop enquanto nave ativa:
-    //    - Aumentar y (descer)
-    //    - Verificar se chegou no chão (y > ALTURA_TELA - 50)
-    //       Se sim: marcar inativa, incrementar navesEscaparam
-    //    - Dormir um pouco (usleep)
-    // 3. Retornar
-
-    // IMPORTANTE: Usar mutex ao modificar contadores!
-
+    // Estrutura auxiliar para passar dados para a thread
+    struct DadosNave {
+        EstadoJogo* estado;
+        Nave* nave;
+    };
+    
+    DadosNave* dados = (DadosNave*)arg;
+    EstadoJogo* estado = dados->estado;
+    Nave* nave = dados->nave;
+    
+    // Loop principal: mover a nave para baixo
+    while (nave->ativa && estado->jogoAtivo) {
+        // Mover nave para baixo
+        nave->y += nave->velocidade;
+        
+        // Verificar se chegou no chão (50 pixels é a margem inferior)
+        if (nave->y > ALTURA_TELA - 50) {
+            // Nave escapou! Marcar como inativa e incrementar contador
+            pthread_mutex_lock(&estado->mutexGeral);
+            nave->ativa = false;
+            estado->navesEscaparam++;
+            pthread_mutex_unlock(&estado->mutexGeral);
+            
+            std::cout << "Nave escapou! Total escapadas: " << estado->navesEscaparam << "\n";
+        }
+        
+        // Dormir um pouco para controlar velocidade (aproximadamente 60 FPS)
+        usleep(16000);  // 16ms = ~60 FPS
+    }
+    
+    delete dados;  // Liberar estrutura auxiliar
     return nullptr;
 }
 
 void* threadSpawnNaves(void* arg) {
-    // TODO: Thread que cria naves periodicamente
-    // 1. Receber EstadoJogo
-    // 2. Loop enquanto não criou todas as naves:
-    //    - Criar nave em posição X aleatória (rand() % LARGURA_TELA)
-    //    - Adicionar na lista (MUTEX!)
-    //    - Criar thread para mover a nave
-    //    - Dormir um tempo (baseado na dificuldade)
-    // 3. Retornar
-
-    // Exemplo:
-    // while(estado->naves.size() < estado->totalNaves && estado->jogoAtivo) {
-    //     int x = rand() % LARGURA_TELA;
-    //     Nave* nova = criarNave(x, velocidade);
-    //
-    //     pthread_mutex_lock(&estado->mutexGeral);
-    //     estado->naves.push_back(nova);
-    //     pthread_mutex_unlock(&estado->mutexGeral);
-    //
-    //     pthread_create(&nova->thread, nullptr, threadNave, ...);
-    //     sleep(2);  // Intervalo entre naves
-    // }
-
+    EstadoJogo* estado = (EstadoJogo*)arg;
+    
+    // Velocidade base da nave (pode variar com dificuldade)
+    int velocidade = 2;  // 2 pixels por frame
+    int intervaloSpawn = 2;  // 2 segundos entre cada nave
+    
+    // Inicializar gerador de números aleatórios
+    srand(time(nullptr));
+    
+    // Loop: criar naves até atingir o total ou jogo acabar
+    while (estado->jogoAtivo) {
+        pthread_mutex_lock(&estado->mutexGeral);
+        int navesAtuais = estado->naves.size();
+        int total = estado->totalNaves;
+        pthread_mutex_unlock(&estado->mutexGeral);
+        
+        // Verificar se já criou todas as naves necessárias
+        if (navesAtuais >= total) {
+            break;
+        }
+        
+        // Criar nave em posição X aleatória
+        int x = 50 + (rand() % (LARGURA_TELA - 100));  // Entre 50 e LARGURA-50
+        Nave* nova = criarNave(x, velocidade);
+        
+        // Atribuir textura compartilhada
+        nova->textura = estado->texturaNave;
+        
+        // Adicionar na lista (proteger com mutex)
+        pthread_mutex_lock(&estado->mutexGeral);
+        estado->naves.push_back(nova);
+        pthread_mutex_unlock(&estado->mutexGeral);
+        
+        // Criar estrutura de dados para passar à thread
+        struct DadosNave {
+            EstadoJogo* estado;
+            Nave* nave;
+        };
+        DadosNave* dados = new DadosNave;
+        dados->estado = estado;
+        dados->nave = nova;
+        
+        // Criar thread para mover esta nave
+        pthread_create(&nova->thread, nullptr, threadNave, dados);
+        pthread_detach(nova->thread);  // Detach para não precisar fazer join
+        
+        std::cout << "Nova nave criada na posição X=" << x << "\n";
+        
+        // Aguardar intervalo antes de criar próxima nave
+        sleep(intervaloSpawn);
+    }
+    
+    std::cout << "Thread de spawn encerrada\n";
     return nullptr;
 }
 
 void destruirNave(Nave* nave) {
-    // TODO: Liberar memória
-    // delete nave;
+    if (nave) {
+        // NÃO destruir textura aqui - ela é compartilhada!
+        // A textura será destruída no finalizarJogo
+        delete nave;
+    }
 }

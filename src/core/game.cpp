@@ -5,6 +5,7 @@
 #include "../entities/nave.h"
 #include "../entities/foguete.h"
 #include "../systems/dificuldade.h"
+#include <SDL.h>
 #include <cstdlib>
 
 void inicializarJogo(EstadoJogo* estado, int dificuldade) {
@@ -31,6 +32,10 @@ void inicializarJogo(EstadoJogo* estado, int dificuldade) {
     estado->vitoria = false;
     estado->tempoRecarga = params.tempoRecarga;
 
+    // Recursos gráficos (serão definidos no main)
+    estado->renderer = nullptr;
+    estado->texturaNave = nullptr;
+
     // Inicializar mutexes e condition variables
     pthread_mutex_init(&estado->mutexGeral, nullptr);
     pthread_mutex_init(&estado->mutexLancadores, nullptr);
@@ -38,6 +43,12 @@ void inicializarJogo(EstadoJogo* estado, int dificuldade) {
 }
 
 void finalizarJogo(EstadoJogo* estado) {
+    // Destruir textura compartilhada da nave
+    if (estado->texturaNave) {
+        SDL_DestroyTexture(estado->texturaNave);
+        estado->texturaNave = nullptr;
+    }
+
     // Destruir mutexes e condition variables
     pthread_mutex_destroy(&estado->mutexGeral);
     pthread_mutex_destroy(&estado->mutexLancadores);

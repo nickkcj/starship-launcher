@@ -11,6 +11,8 @@
 struct Nave;
 struct Foguete;
 struct Bateria;
+struct SDL_Renderer;
+struct SDL_Texture;
 
 // Constantes do jogo
 const int LARGURA_TELA = 800;
@@ -44,6 +46,10 @@ struct EstadoJogo {
     pthread_mutex_t mutexGeral;           // Protege listas e contadores
     pthread_mutex_t mutexLancadores;      // Protege array de lançadores
     pthread_cond_t condCarregador;        // Sinaliza carregador
+
+    // Recursos gráficos
+    SDL_Renderer* renderer;               // Renderizador (para threads)
+    SDL_Texture* texturaNave;             // Textura da nave (compartilhada)
 
     // TODO: Adicionar mais conforme necessário
 };
