@@ -26,6 +26,7 @@ void inicializarJogo(EstadoJogo* estado, int dificuldade) {
     // Estado do jogo
     estado->jogoAtivo = true;
     estado->vitoria = false;
+    estado->tempoRecarga = 2;  // 2 segundos (ajustar quando implementar dificuldade)
 
     // Inicializar mutexes e condition variables
     pthread_mutex_init(&estado->mutexGeral, nullptr);

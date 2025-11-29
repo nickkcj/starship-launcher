@@ -8,6 +8,7 @@
 #include "core/game.h"
 #include "core/renderer.h"
 #include "systems/colisao.h"
+#include "systems/carregador.h"
 
 const int LARGURA = 800;
 const int ALTURA = 600;
@@ -68,6 +69,10 @@ int main() {
     // 5. CRIAR BATERIA
     Bateria* bateria = criarBateria(LARGURA/2, ALTURA - 80);
     estado.bateria = bateria;  // Associar bateria ao estado
+
+    // 5.1 CRIAR THREAD DO CARREGADOR
+    pthread_t threadCarreg;
+    pthread_create(&threadCarreg, nullptr, threadCarregador, &estado);
 
     // 6. LOOP PRINCIPAL
     bool jogoAtivo = true;
@@ -195,6 +200,11 @@ int main() {
 
     // 7. LIMPAR E ENCERRAR
     std::cout << "Encerrando...\n";
+
+    // Encerrar thread do carregador
+    estado.jogoAtivo = false;
+    pthread_cond_signal(&estado.condCarregador);  // Acordar para sair do loop
+    pthread_join(threadCarreg, nullptr);
 
     finalizarJogo(&estado);
     destruirBateria(bateria);

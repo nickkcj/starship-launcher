@@ -38,6 +38,7 @@ struct EstadoJogo {
     // Controle
     bool jogoAtivo;
     bool vitoria;  // true = vitória, false = derrota
+    int tempoRecarga;  // Tempo em segundos para recarregar lançadores
 
     // Sincronização (IMPORTANTE!)
     pthread_mutex_t mutexGeral;           // Protege listas e contadores
