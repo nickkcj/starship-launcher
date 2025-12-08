@@ -18,8 +18,6 @@ struct Bateria {
     int x;               // Posição X (centro da tela)
     int y;               // Posição Y (perto do fundo)
     AnguloDisparo angulo; // Ângulo atual
-
-    // TODO: Adicionar mais campos se necessário
 };
 
 // Funções da bateria
