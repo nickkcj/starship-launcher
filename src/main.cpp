@@ -1,5 +1,4 @@
-// Nick J - Loop principal do jogo (evoluindo aos poucos)
-// Versão atual: Etapa 7 - Detecção de colisão
+// Nick J - Loop principal do jogo
 
 #include <SDL.h>
 #include <SDL_ttf.h>
