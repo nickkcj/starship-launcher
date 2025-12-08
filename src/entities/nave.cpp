@@ -94,38 +94,41 @@ void* threadNave(void* arg) {
 
 void* threadSpawnNaves(void* arg) {
     EstadoJogo* estado = (EstadoJogo*)arg;
-    
-    // Velocidade base da nave (pode variar com dificuldade)
-    int velocidade = 2;  // 2 pixels por frame
-    int intervaloSpawn = 2;  // 2 segundos entre cada nave
-    
+
+    // Usar parâmetros de dificuldade do estado do jogo
+    int velocidade = estado->velocidadeNave;
+    int intervaloSpawn = estado->intervaloSpawn;
+
+    std::cout << "Spawn configurado: velocidade=" << velocidade
+              << ", intervalo=" << intervaloSpawn << "s\n";
+
     // Inicializar gerador de números aleatórios
     srand(time(nullptr));
-    
+
     // Loop: criar naves até atingir o total ou jogo acabar
     while (estado->jogoAtivo) {
         pthread_mutex_lock(&estado->mutexGeral);
         int navesAtuais = estado->naves.size();
         int total = estado->totalNaves;
         pthread_mutex_unlock(&estado->mutexGeral);
-        
+
         // Verificar se já criou todas as naves necessárias
         if (navesAtuais >= total) {
             break;
         }
-        
+
         // Criar nave em posição X aleatória
         int x = 50 + (rand() % (LARGURA_TELA - 100));  // Entre 50 e LARGURA-50
         Nave* nova = criarNave(x, velocidade);
-        
+
         // Atribuir textura compartilhada
         nova->textura = estado->texturaNave;
-        
+
         // Adicionar na lista (proteger com mutex)
         pthread_mutex_lock(&estado->mutexGeral);
         estado->naves.push_back(nova);
         pthread_mutex_unlock(&estado->mutexGeral);
-        
+
         // Criar estrutura de dados para passar à thread
         struct DadosNave {
             EstadoJogo* estado;
@@ -134,17 +137,17 @@ void* threadSpawnNaves(void* arg) {
         DadosNave* dados = new DadosNave;
         dados->estado = estado;
         dados->nave = nova;
-        
+
         // Criar thread para mover esta nave
         pthread_create(&nova->thread, nullptr, threadNave, dados);
         pthread_detach(nova->thread);  // Detach para não precisar fazer join
-        
-        std::cout << "Nova nave criada na posição X=" << x << "\n";
-        
+
+        std::cout << "Nova nave criada na posição X=" << x << " (vel=" << velocidade << ")\n";
+
         // Aguardar intervalo antes de criar próxima nave
         sleep(intervaloSpawn);
     }
-    
+
     std::cout << "Thread de spawn encerrada\n";
     return nullptr;
 }

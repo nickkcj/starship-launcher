@@ -41,6 +41,8 @@ struct EstadoJogo {
     bool jogoAtivo;
     bool vitoria;  // true = vitória, false = derrota
     int tempoRecarga;  // Tempo em segundos para recarregar lançadores
+    int velocidadeNave;  // Velocidade das naves (dificuldade)
+    int intervaloSpawn;  // Intervalo entre spawn de naves (dificuldade)
 
     // Sincronização (IMPORTANTE!)
     pthread_mutex_t mutexGeral;           // Protege listas e contadores

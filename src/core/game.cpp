@@ -31,6 +31,8 @@ void inicializarJogo(EstadoJogo* estado, int dificuldade) {
     estado->jogoAtivo = true;
     estado->vitoria = false;
     estado->tempoRecarga = params.tempoRecarga;
+    estado->velocidadeNave = params.velocidadeNave;
+    estado->intervaloSpawn = params.intervaloSpawn;
 
     // Recursos gráficos (serão definidos no main)
     estado->renderer = nullptr;

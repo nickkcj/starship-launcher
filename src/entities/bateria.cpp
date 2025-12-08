@@ -40,12 +40,12 @@ void desenharBateria(SDL_Renderer* renderer, Bateria* bat) {
             pontaY = canY - 30;
             break;
         case DIAGONAL_ESQ:
-            pontaX = canX - 25;
-            pontaY = canY - 25;
+            pontaX = canX - 21;
+            pontaY = canY - 21;
             break;
         case DIAGONAL_DIR:
-            pontaX = canX + 25;
-            pontaY = canY - 25;
+            pontaX = canX + 21;
+            pontaY = canY - 21;
             break;
         case HORIZONTAL_ESQ:
             pontaX = canX - 30;
@@ -57,24 +57,38 @@ void desenharBateria(SDL_Renderer* renderer, Bateria* bat) {
             break;
     }
 
-    // Desenhar canhão grosso (3 linhas paralelas)
+    // Desenhar canhão grosso
     SDL_SetRenderDrawColor(renderer, 255, 200, 0, 255);
 
-    // Offset perpendicular ao canhão
-    float dx = pontaX - canX;
-    float dy = pontaY - canY;
-    float comprimento = sqrt(dx*dx + dy*dy);
-    float perpX = -dy / comprimento * 2;
-    float perpY = dx / comprimento * 2;
+    // Para ângulos horizontais, desenhar canhão com espessura vertical
+    if (bat->angulo == HORIZONTAL_ESQ || bat->angulo == HORIZONTAL_DIR) {
+        // Canhão horizontal - espessura de 5 linhas para ficar visível
+        for (int i = -2; i <= 2; i++) {
+            SDL_RenderDrawLine(renderer, canX, canY + i, pontaX, pontaY + i);
+        }
+    } else {
+        // Canhões verticais ou diagonais - usar offset perpendicular
+        float dx = pontaX - canX;
+        float dy = pontaY - canY;
+        float comprimento = sqrt(dx*dx + dy*dy);
+        float perpX = -dy / comprimento * 2;
+        float perpY = dx / comprimento * 2;
 
-    // 3 linhas paralelas para dar espessura
-    SDL_RenderDrawLine(renderer, canX, canY, pontaX, pontaY);
-    SDL_RenderDrawLine(renderer,
-        canX + perpX, canY + perpY,
-        pontaX + perpX, pontaY + perpY);
-    SDL_RenderDrawLine(renderer,
-        canX - perpX, canY - perpY,
-        pontaX - perpX, pontaY - perpY);
+        // 5 linhas paralelas para dar espessura
+        SDL_RenderDrawLine(renderer, canX, canY, pontaX, pontaY);
+        SDL_RenderDrawLine(renderer,
+            canX + perpX, canY + perpY,
+            pontaX + perpX, pontaY + perpY);
+        SDL_RenderDrawLine(renderer,
+            canX - perpX, canY - perpY,
+            pontaX - perpX, pontaY - perpY);
+        SDL_RenderDrawLine(renderer,
+            canX + perpX*2, canY + perpY*2,
+            pontaX + perpX*2, pontaY + perpY*2);
+        SDL_RenderDrawLine(renderer,
+            canX - perpX*2, canY - perpY*2,
+            pontaX - perpX*2, pontaY - perpY*2);
+    }
 }
 
 
