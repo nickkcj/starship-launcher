@@ -55,9 +55,4 @@ void finalizarJogo(EstadoJogo* estado) {
     pthread_mutex_destroy(&estado->mutexGeral);
     pthread_mutex_destroy(&estado->mutexLancadores);
     pthread_cond_destroy(&estado->condCarregador);
-
-    // Limpar listas (naves e foguetes serão adicionados depois)
-    // TODO: quando tiver naves e foguetes, liberar memória deles aqui
-
-    // Bateria será destruída no main por enquanto
 }
