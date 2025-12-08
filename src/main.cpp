@@ -333,7 +333,7 @@ int main() {
                             // Descarregar lançador
                             estado.lancadores[lancadorUsado] = 0;
 
-                            // Sinalizar carregador (quando Nick C implementar)
+                            // Sinalizar carregador
                             pthread_cond_signal(&estado.condCarregador);
 
                             std::cout << "DISPAROU do lançador " << lancadorUsado << "!\n";
